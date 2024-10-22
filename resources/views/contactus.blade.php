@@ -11,6 +11,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"
         integrity="sha384-oBqDVmMz4fnFO9gyb4Q3j9B1W62AsQGT2T9T9E4jD9p9yt94zD2Z1mELPTbDplQ4" crossorigin="anonymous">
     </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0- 
+     alpha/css/bootstrap.css"
+        rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <style>
@@ -88,9 +98,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"
         integrity="sha384-oBqDVmMz4fnFO9gyb4Q3j9B1W62AsQGT2T9T9E4jD9p9yt94zD2Z1mELPTbDplQ4" crossorigin="anonymous">
     </script>
+    {{-- <script src="{{ asset('js/contact-us.js') }}"></script> --}}
 
     <script>
         $(document).ready(function() {
+            // Set toastr options globally
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right", // Optional: Set position of toastr notifications
+                "timeOut": "5000", // Optional: Duration for which the notification is shown
+                "extendedTimeOut": "1000" // Optional: Duration for which the notification is shown on hover
+            };
+
             $('#contact-form').validate({
                 rules: {
                     name: 'required',
@@ -119,15 +139,11 @@
 
                     if (file) {
                         if (file.size > 2 * 1024 * 1024) {
-                            $('#alert-container').html(
-                                '<div class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg m-2">File size exceeds 2MB limit.</div>'
-                            );
+                            toastr.error('File size exceeds 2MB limit.');
                             return;
                         }
                         if (!allowedTypes.includes(file.type)) {
-                            $('#alert-container').html(
-                                '<div class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg m-2">Invalid file format. Allowed: .pdf, .png, .jpeg</div>'
-                            );
+                            toastr.error('Invalid file format. Allowed: .pdf, .png, .jpeg');
                             return;
                         }
                     }
@@ -147,22 +163,15 @@
                             $('#loader').show(); // Show the full-screen loader
                         },
                         success: function(response) {
-                            $('#alert-container').html(
-                                '<div class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg m-2">Message sent successfully!</div>'
-                            );
-                            $('#contact-form')[0].reset(); // Reset form fields
+                            toastr.success('Form submitted successfully!');
                         },
                         error: function(xhr) {
                             var errors = xhr.responseJSON.errors;
-                            var errorMsg = '<p>An error occurred. Please try again.</p>';
+                            var errorMsg = 'An error occurred. Please try again.';
                             if (errors) {
-                                errorMsg = '<p>' + Object.values(errors).flat().join(
-                                    '</p><p>') + '</p>'; // Combine all error messages
+                                errorMsg = Object.values(errors).flat().join('<br>');
                             }
-                            $('#alert-container').html(
-                                '<div class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg m-2">' + errorMsg +
-                                '</div>'
-                            );
+                            toastr.error(errorMsg);
                         },
                         complete: function() {
                             $('#btnSubmit').prop('disabled',
@@ -174,6 +183,7 @@
             });
         });
     </script>
+
 
 </body>
 
